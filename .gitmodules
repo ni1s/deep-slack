@@ -1,0 +1,6 @@
+[submodule "slack_history"]
+	path = slack_history
+	url = https://gist.github.com/fb7a070f52883849de35.git
+[submodule "word-rnn-tensorflow"]
+	path = word-rnn-tensorflow
+	url = https://github.com/hunkim/word-rnn-tensorflow.git
