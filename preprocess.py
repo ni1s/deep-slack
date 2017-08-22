@@ -22,8 +22,6 @@ USER_ID = METADATA['auth_info']['user_id']
 
 lines = []
 
-fp = codecs.open("preprocessed.txt", "w", "utf-8")
-
 def clean_string(s):
     for x in [u'\u0027', u'\u0060', u'\u00B4', u'\u2018', u'\u2019', u'\u201B', u'\x60', u'\xB4']:
         s = s.replace(x,"'")
@@ -71,22 +69,24 @@ def preprocess(text):
     return string.strip().lower()
 #    return text.strip()
 
-for folder in ['direct_messages', 'private_channels', 'channels']:
-    for filename in os.listdir(os.path.join(HISTORY_PATH, folder)):
-        if filename.endswith(".json") and not filename.startswith('sk-'):
-            print os.path.join(HISTORY_PATH, folder, filename)
-            data = json.loads(open(os.path.join(HISTORY_PATH, folder, filename)).read())
-            for message in data['messages']:
-                if 'user' not in message: # skip empty archives
-                    continue
+if __name__ == "__main__":
+    fp = codecs.open("preprocessed.txt", "w", "utf-8")
+    for folder in ['direct_messages', 'private_channels', 'channels']:
+        for filename in os.listdir(os.path.join(HISTORY_PATH, folder)):
+            if filename.endswith(".json") and not filename.startswith('sk-'):
+                print os.path.join(HISTORY_PATH, folder, filename)
+                data = json.loads(open(os.path.join(HISTORY_PATH, folder, filename)).read())
+                for message in data['messages']:
+                    if 'user' not in message: # skip empty archives
+                        continue
 
-                if ANONMYIZE and message['user'] != USER_ID:
-                    print >> fp, "[SOMEONE]"
-                else:
-                    print >> fp, "[%s]" % message['user']
-#                print >> fp, "[%s]" % USERS.get(message['user'], 'SOMEONE').upper()
-                print >> fp, preprocess(message['text']) #.encode("latin-1","ignore")
-                print >> fp
-        else:
-            continue
-    print >> fp, "\n***\n" # Mark "end of conversations" to give the network a chance to understand it
+                    if ANONMYIZE and message['user'] != USER_ID:
+                        print >> fp, "[SOMEONE]"
+                    else:
+                        print >> fp, "[%s]" % message['user']
+    #                print >> fp, "[%s]" % USERS.get(message['user'], 'SOMEONE').upper()
+                    print >> fp, preprocess(message['text']) #.encode("latin-1","ignore")
+                    print >> fp
+            else:
+                continue
+        print >> fp, "\n***\n" # Mark "end of conversations" to give the network a chance to understand it

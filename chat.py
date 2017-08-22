@@ -6,6 +6,7 @@ import re
 import codecs
 import sys
 import subprocess
+import preprocess
 
 if len(sys.argv) > 1:
     message = sys.argv[1]
@@ -22,13 +23,13 @@ USER = METADATA['auth_info']['user']
 USER_ID = METADATA['auth_info']['user_id']
 
 os.chdir('word-rnn-tensorflow')
-
-# TODO: preprocess message
-prime = '"[SOMEONE] ' + message + " [%s] " % USER_ID + ' "'
-output = subprocess.check_output(['python', 'sample.py', '-n', '2000', '--prime', prime, '--save_dir', 'save/deep_slack'])
+# + " [%s] " % USER_ID +
+prime = '[SOMEONE] ' + preprocess.preprocess(message)
+output = subprocess.check_output(['python', 'sample.py', '-n', '2000', '--prime', prime, '--save_dir', 'save/deep_slack']) #, '--pick', '2'])
 
 print ">>>>>>>>>>>>>>>"
-match = re.search(r"(\[%s\]\s[^\[]+)+" % USER_ID, output)
-print "\n".join(list(match.groups()))
+match = re.search(r"((\[%s\]\s[^\[]+)+)" % USER_ID, output)
+reply = match.groups()[0]
+print reply.replace("[", "\n[").replace("]", "]\n") #"\n".join(list(match.groups()))
 print "<<<<<<<<<<<<<<<"
 print "output", output.replace("[", "\n[").replace("]", "]\n")
